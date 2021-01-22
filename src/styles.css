@@ -11,31 +11,41 @@ body {
   text-align: center;
 }
 
-.banner {
-  opacity: 0.2;
-  position: absolute;
-  left: -9999px;
-  right: -9999px;
+.header::after {
+  content: "";
+  background: url("./img/banner.png");
+  background-position: center;
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   margin: auto;
+  position: absolute;
+  z-index: -1;
 }
 
 .logo {
   position: absolute;
   top: 0;
   bottom: 0;
+  height: 100px;
   left: 20px;
   margin: auto;
-  height: 100px;
+  z-index: 10;
+}
+
+.logo img {
+  height: 100%;
 }
 
 .header > h1 {
-  color: #444444;
+  color: #333333;
   position: absolute;
   width: 100%;
   line-height: 175px;
   vertical-align: middle;
-  font-size: 3em;
-  z-index: 2;
+  font-size: 3.2em;
 }
 
 .nav-link {

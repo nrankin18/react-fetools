@@ -21,10 +21,24 @@ class Header extends React.Component {
         </div>
         <Navbar bg="dark" variant="dark" className="justify-content-center">
           <Nav>
-            <Nav.Link active>Create a Sector File</Nav.Link>
-            <Nav.Link>Convert to KML</Nav.Link>
-            <Nav.Link>Convert FAA MVA/MIA</Nav.Link>
-            <Nav.Link>Help</Nav.Link>
+            <Nav.Link
+              className={this.props.page === 0 ? "active" : ""}
+              onClick={() => this.props.setPage(0)}
+            >
+              Create a Sector File
+            </Nav.Link>
+            <Nav.Link
+              className={this.props.page === 1 ? "active" : ""}
+              onClick={() => this.props.setPage(1)}
+            >
+              Convert to KML
+            </Nav.Link>
+            <Nav.Link
+              className={this.props.page === 2 ? "active" : ""}
+              onClick={() => this.props.setPage(2)}
+            >
+              Convert FAA MVA/MIA
+            </Nav.Link>
           </Nav>
         </Navbar>
       </div>

@@ -32,7 +32,7 @@ class KML extends React.Component {
         if (e.data.isStatus) {
           this.setState({ readingStatus: e.data.status });
         } else {
-          console.log(e.data.parsedObject.star);
+          console.log(e.data.parsedObject);
           this.setState({ step: 3 });
         }
       }.bind(this);

@@ -5,6 +5,9 @@ onmessage = function (e) {
     artccLow: new Map(),
     sid: new Map(),
     star: new Map(),
+    geo: new Array(),
+    regions: new Array(),
+    labels: new Array(),
   };
   var text = e.data.split("\n");
   // Read .sct line by line
@@ -21,6 +24,7 @@ onmessage = function (e) {
   var state = 0;
   var currentSID = "";
   var currentSTAR = "";
+  var regionBuffer = null;
   while (text.length !== 0) {
     var line = text.shift();
     line = line.split(";")[0]; // Remove comments
@@ -200,6 +204,43 @@ onmessage = function (e) {
             ])
           );
         }
+        break;
+      case 6:
+        line = line.split(" ");
+        parsedObject.geo.push({
+          lat1: line[0],
+          long1: line[1],
+          lat2: line[2],
+          long2: line[3],
+          color: line[4] ?? "",
+        });
+        break;
+      case 7:
+        if (!/^\s/.test(line)) {
+          console.log(regionBuffer);
+          if (regionBuffer !== null) {
+            parsedObject.regions.push(regionBuffer);
+          }
+          line = line.split(" ");
+          regionBuffer = {
+            color: line[0],
+            coordinates: [{ lat: line[1], long: line[2] }],
+          };
+        } else {
+          line = line.trim().split(" ");
+          regionBuffer.coordinates = regionBuffer.coordinates.concat([
+            { lat: line[0], long: line[1] },
+          ]);
+        }
+        break;
+      case 8:
+        line = line.match(/(?:[^\s"]+|"[^"]*")+/g); //Split line on spaces not inside quotes
+        parsedObject.labels.push({
+          lat: line[1],
+          long: line[2],
+          label: line[0].replace(/"/g, ""),
+          color: line[4] ?? "",
+        });
         break;
       default:
         continue;

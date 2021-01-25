@@ -31,52 +31,52 @@ onmessage = function (e) {
     line = line.trimRight(); // Remove trailing whitespace
     if (!line) continue;
     if (
-      line === "[INFO]" ||
-      line === "[VOR]" ||
-      line === "[NDB]" ||
-      line === "[AIRPORT]" ||
-      line === "[RUNWAY]" ||
-      line === "[FIXES]" ||
-      line === "[LOW AIRWAY]" ||
-      line === "[HIGH AIRWAY]"
+      line.toUpperCase() === "[INFO]" ||
+      line.toUpperCase() === "[VOR]" ||
+      line.toUpperCase() === "[NDB]" ||
+      line.toUpperCase() === "[AIRPORT]" ||
+      line.toUpperCase() === "[RUNWAY]" ||
+      line.toUpperCase() === "[FIXES]" ||
+      line.toUpperCase() === "[LOW AIRWAY]" ||
+      line.toUpperCase() === "[HIGH AIRWAY]"
     )
       state = 0;
-    if (line === "[ARTCC]") {
+    if (line.toUpperCase() === "[ARTCC]") {
       postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
       state = 1;
       continue;
     }
-    if (line === "[ARTCC HIGH]") {
+    if (line.toUpperCase() === "[ARTCC HIGH]") {
       postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
       state = 2;
       continue;
     }
-    if (line === "[ARTCC LOW]") {
+    if (line.toUpperCase() === "[ARTCC LOW]") {
       postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
       state = 3;
       continue;
     }
-    if (line === "[SID]") {
+    if (line.toUpperCase() === "[SID]") {
       postMessage({ isStatus: 1, status: "SIDs" });
       state = 4;
       continue;
     }
-    if (line === "[STAR]") {
+    if (line.toUpperCase() === "[STAR]") {
       postMessage({ isStatus: 1, status: "STARs" });
       state = 5;
       continue;
     }
-    if (line === "[GEO]") {
+    if (line.toUpperCase() === "[GEO]") {
       postMessage({ isStatus: 1, status: "Geography" });
       state = 6;
       continue;
     }
-    if (line === "[REGIONS]") {
+    if (line.toUpperCase() === "[REGIONS]") {
       postMessage({ isStatus: 1, status: "Regions" });
       state = 7;
       continue;
     }
-    if (line === "[LABELS]") {
+    if (line.toUpperCase() === "[LABELS]") {
       postMessage({ isStatus: 1, status: "Labels" });
       state = 8;
       continue;

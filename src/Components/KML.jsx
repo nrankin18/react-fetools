@@ -33,7 +33,7 @@ class KML extends React.Component {
           this.setState({ readingStatus: e.data.status });
         } else {
           console.log(e.data.parsedObject);
-          this.setState({ step: 3 });
+          this.setState({ step: 3, parsedObject: e.data.parsedObject });
         }
       }.bind(this);
     }.bind(this);
@@ -42,6 +42,59 @@ class KML extends React.Component {
   }
 
   render() {
+    const sids = [];
+    const stars = [];
+    if (this.state.parsedObject) {
+      this.state.parsedObject.sid.forEach((sid, name) => {
+        sids.push(
+          <div
+            className="map sid"
+            onClick={(e) => {
+              if (e.target.classList.contains("selected"))
+                e.target.classList.remove("selected");
+              else e.target.classList.add("selected");
+            }}
+          >
+            {name}
+          </div>
+        );
+      });
+      this.state.parsedObject.star.forEach((star, name) => {
+        stars.push(
+          <div
+            className="map star"
+            onClick={(e) => {
+              if (e.target.classList.contains("selected"))
+                e.target.classList.remove("selected");
+              else e.target.classList.add("selected");
+            }}
+          >
+            {name}
+          </div>
+        );
+      });
+    }
+
+    const nextButton =
+      this.state.file !== null ? (
+        <Button
+          className="next-button"
+          onClick={() => this.readFile()}
+          variant="success"
+        >
+          Next
+        </Button>
+      ) : (
+        <Button
+          className="next-button"
+          onClick={() => this.readFile()}
+          variant="success"
+          disabled
+        >
+          Next
+        </Button>
+      );
+
     if (this.props.visible) {
       return (
         <div className="page-container">
@@ -83,17 +136,7 @@ class KML extends React.Component {
                 </section>
               )}
             </Dropzone>
-            <Button
-              className={
-                this.state.file !== null
-                  ? "next-button"
-                  : "next-button disabled"
-              }
-            >
-              <div className="next-button" onClick={() => this.readFile()}>
-                Next
-              </div>
-            </Button>
+            {nextButton}
           </div>
           <div
             className={
@@ -117,8 +160,107 @@ class KML extends React.Component {
             }
           >
             <h3>Select maps to convert:</h3>
-            <input type="checkbox" id="geo-check" />
-            <label>GEO Section</label>
+            <div className="check-container">
+              <div>
+                <input type="checkbox" id="artcc-check" />
+                <label for="artcc-check">ARTCC Boundaries</label>
+              </div>
+              <div>
+                <input type="checkbox" id="artcc-high-check" />
+                <label for="artcc-high-check">ARTCC High Boundaries</label>
+              </div>
+              <div>
+                <input type="checkbox" id="artcc-low-check" />
+                <label for="artcc-low-check">ARTCC Low Boundaries</label>
+              </div>
+              <div>
+                <input type="checkbox" id="geo-check" />
+                <label for="geo-check">Geography</label>
+              </div>
+              <div>
+                <input type="checkbox" id="labels-check" />
+                <label for="labels-check">Labels</label>
+              </div>
+              <div>
+                <input type="checkbox" id="regions-check" />
+                <label for="regions-check">Regions</label>
+              </div>
+            </div>
+            <div className="check-container">
+              <div className="map-container">
+                <h5 className="map-label">SIDs:</h5>
+                <div className="map-list" id="sid-list">
+                  {sids}
+                </div>
+                <div className="select-buttons-container">
+                  <Button
+                    variant="outline-secondary"
+                    className="select-button"
+                    onClick={() => {
+                      Array.prototype.forEach.call(
+                        document.getElementsByClassName("sid"),
+                        function (e) {
+                          e.classList.add("selected");
+                        }
+                      );
+                    }}
+                  >
+                    Select All
+                  </Button>
+                  <Button
+                    variant="outline-secondary"
+                    className="select-button"
+                    onClick={() => {
+                      Array.prototype.forEach.call(
+                        document.getElementsByClassName("sid"),
+                        function (e) {
+                          e.classList.remove("selected");
+                        }
+                      );
+                    }}
+                  >
+                    Select None
+                  </Button>
+                </div>
+              </div>
+              <div className="map-container">
+                <h5 className="map-label">STARs:</h5>
+                <div className="map-list">{stars}</div>
+                <div className="select-buttons-container">
+                  <Button
+                    variant="outline-secondary"
+                    className="select-button"
+                    onClick={() => {
+                      Array.prototype.forEach.call(
+                        document.getElementsByClassName("star"),
+                        function (e) {
+                          e.classList.add("selected");
+                        }
+                      );
+                    }}
+                  >
+                    Select All
+                  </Button>
+                  <Button
+                    variant="outline-secondary"
+                    className="select-button"
+                    onClick={() => {
+                      Array.prototype.forEach.call(
+                        document.getElementsByClassName("star"),
+                        function (e) {
+                          e.classList.remove("selected");
+                        }
+                      );
+                    }}
+                  >
+                    Select None
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <Button className="next-button" variant="success">
+              Convert
+            </Button>
           </div>
         </div>
       );

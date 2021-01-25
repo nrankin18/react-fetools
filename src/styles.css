@@ -112,7 +112,7 @@ body {
 
 .next-button {
   float: right;
-  font-size: 1.4em;
+  font-size: 1em;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -123,4 +123,49 @@ body {
 
 .hidden {
   display: none;
+}
+
+.check-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+label {
+  margin-left: 5px;
+}
+
+.map-container {
+  width: 40%;
+}
+
+.map-list {
+  height: 300px;
+  border: 2px solid #777777;
+  overflow-y: scroll;
+}
+
+.select-buttons-container {
+  text-align: center;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.select-button {
+  margin: 0 10px;
+}
+
+.map-label {
+  margin: 5px;
+}
+
+.map {
+  width: 100%;
+  border: solid 0.5px lightgrey;
+  cursor: pointer;
+  user-select: none;
+  padding-left: 5px;
+}
+
+.selected {
+  background-color: rgb(141, 184, 241);
 }

@@ -6,15 +6,39 @@ import Dropzone from "react-dropzone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
 import Button from "react-bootstrap/Button";
+import PulseLoader from "react-spinners/PulseLoader";
 
 class KML extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { step: 1, file: null };
+    this.state = {
+      step: 1,
+      file: null,
+      readingStatus: "File",
+      artcc: new Map(),
+      artccHigh: new Map(),
+      artccLow: new Map(),
+      sid: new Map(),
+    };
   }
 
-  componentDidUpdate() {
-    console.log(this.state.file);
+  readFile() {
+    this.setState({ step: 2 });
+    var reader = new FileReader();
+    reader.onload = function () {
+      const worker = new Worker("Workers/ParseSCT.js");
+      worker.postMessage(reader.result);
+      worker.onmessage = function (e) {
+        if (e.data.isStatus) {
+          this.setState({ readingStatus: e.data.status });
+        } else {
+          console.log(e.data.parsedObject.star);
+          this.setState({ step: 3 });
+        }
+      }.bind(this);
+    }.bind(this);
+
+    reader.readAsText(this.state.file);
   }
 
   render() {
@@ -32,8 +56,6 @@ class KML extends React.Component {
                 if (acceptedFiles !== null)
                   this.setState({ file: acceptedFiles[0] });
               }}
-              onDragOver={console.log("over")}
-              onDragEnter={console.log("enter")}
             >
               {({ getRootProps, getInputProps }) => (
                 <section>
@@ -68,10 +90,7 @@ class KML extends React.Component {
                   : "next-button disabled"
               }
             >
-              <div
-                className="next-button"
-                onClick={() => this.setState({ step: 2 })}
-              >
+              <div className="next-button" onClick={() => this.readFile()}>
                 Next
               </div>
             </Button>
@@ -81,8 +100,25 @@ class KML extends React.Component {
               this.state.step === 2 ? "step-container" : "step-container hidden"
             }
           >
-            {"Reading " + (this.state.file ? this.state.file.name : "") + "..."}
-            <textarea readOnly>Line 1 Line 2 Line 3</textarea>
+            <div className="status">
+              <i>Reading {this.state.readingStatus}</i>
+              <PulseLoader
+                color="#777777"
+                css={`
+                  margin-left: 10px;
+                `}
+                size={10}
+              />
+            </div>
+          </div>
+          <div
+            className={
+              this.state.step === 3 ? "step-container" : "step-container hidden"
+            }
+          >
+            <h3>Select maps to convert:</h3>
+            <input type="checkbox" id="geo-check" />
+            <label>GEO Section</label>
           </div>
         </div>
       );

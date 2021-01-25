@@ -6,7 +6,7 @@ class Create extends React.Component {
   render() {
     if (this.props.visible) {
       return (
-        <div className="coming">
+        <div className="status">
           <i>Coming soon...</i>
         </div>
       );

@@ -8,7 +8,7 @@ class Progress extends React.Component {
     var i;
     for (i = 1; i <= this.props.steps; i++) {
       steps.push(
-        <Step transition="scale">
+        <Step transition="scale" key={i}>
           {({ accomplished }) => (
             <div className={`step ${accomplished ? "complete" : ""}`} />
           )}

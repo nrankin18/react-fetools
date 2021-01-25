@@ -53,12 +53,12 @@ body {
   padding-right: 30px !important ;
 }
 
-.coming {
+.status {
   width: 100%;
-  font-size: 3em;
+  font-size: 2.5em;
   text-align: center;
   color: #777777;
-  margin-top: 100px;
+  margin: 20px 0;
 }
 
 .page-container {

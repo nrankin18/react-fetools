@@ -12,13 +12,18 @@ class KML extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      step: 1,
+      step: 3,
       file: null,
       readingStatus: "File",
-      artcc: new Map(),
-      artccHigh: new Map(),
-      artccLow: new Map(),
-      sid: new Map(),
+      convertingStatus: "File",
+      artcc: 0,
+      artccHigh: 0,
+      artccLow: 0,
+      geo: 0,
+      labels: 0,
+      regions: 0,
+      sids: [],
+      stars: [],
     };
   }
 
@@ -41,6 +46,29 @@ class KML extends React.Component {
     reader.readAsText(this.state.file);
   }
 
+  convert() {
+    this.setState({ step: 4 });
+    const worker = new Worker("Workers/ConvertSCT.js");
+    worker.postMessage({
+      artcc: this.state.artcc,
+      artccHigh: this.state.artccHigh,
+      artccLow: this.state.artccLow,
+      geo: this.state.geo,
+      regions: this.state.regions,
+      labels: this.state.labels,
+      sids: this.state.sids,
+      stars: this.state.stars,
+      data: this.state.parsedObject,
+    });
+    worker.onmessage = function (e) {
+      if (e.data.isStatus) {
+        this.setState({ convertingStatus: e.data.status });
+      } else {
+        this.setState({ step: 5 });
+      }
+    }.bind(this);
+  }
+
   render() {
     const sids = [];
     const stars = [];
@@ -49,6 +77,7 @@ class KML extends React.Component {
         sids.push(
           <div
             className="map sid"
+            key={name}
             onClick={(e) => {
               if (e.target.classList.contains("selected"))
                 e.target.classList.remove("selected");
@@ -63,6 +92,7 @@ class KML extends React.Component {
         stars.push(
           <div
             className="map star"
+            key={name}
             onClick={(e) => {
               if (e.target.classList.contains("selected"))
                 e.target.classList.remove("selected");
@@ -162,28 +192,64 @@ class KML extends React.Component {
             <h3>Select maps to convert:</h3>
             <div className="check-container">
               <div>
-                <input type="checkbox" id="artcc-check" />
-                <label for="artcc-check">ARTCC Boundaries</label>
+                <input
+                  type="checkbox"
+                  id="artcc-check"
+                  onClick={(e) => {
+                    this.setState({ artcc: e.target.checked });
+                  }}
+                />
+                <label htmlFor="artcc-check">ARTCC Boundaries</label>
               </div>
               <div>
-                <input type="checkbox" id="artcc-high-check" />
-                <label for="artcc-high-check">ARTCC High Boundaries</label>
+                <input
+                  type="checkbox"
+                  id="artcc-high-check"
+                  onClick={(e) => {
+                    this.setState({ artccHigh: e.target.checked });
+                  }}
+                />
+                <label htmlFor="artcc-high-check">ARTCC High Boundaries</label>
               </div>
               <div>
-                <input type="checkbox" id="artcc-low-check" />
-                <label for="artcc-low-check">ARTCC Low Boundaries</label>
+                <input
+                  type="checkbox"
+                  id="artcc-low-check"
+                  onClick={(e) => {
+                    this.setState({ artccLow: e.target.checked });
+                  }}
+                />
+                <label htmlFor="artcc-low-check">ARTCC Low Boundaries</label>
               </div>
               <div>
-                <input type="checkbox" id="geo-check" />
-                <label for="geo-check">Geography</label>
+                <input
+                  type="checkbox"
+                  id="geo-check"
+                  onClick={(e) => {
+                    this.setState({ geo: e.target.checked });
+                  }}
+                />
+                <label htmlFor="geo-check">Geography</label>
               </div>
               <div>
-                <input type="checkbox" id="labels-check" />
-                <label for="labels-check">Labels</label>
+                <input
+                  type="checkbox"
+                  id="labels-check"
+                  onClick={(e) => {
+                    this.setState({ labels: e.target.checked });
+                  }}
+                />
+                <label htmlFor="labels-check">Labels</label>
               </div>
               <div>
-                <input type="checkbox" id="regions-check" />
-                <label for="regions-check">Regions</label>
+                <input
+                  type="checkbox"
+                  id="regions-check"
+                  onClick={(e) => {
+                    this.setState({ regions: e.target.checked });
+                  }}
+                />
+                <label htmlFor="regions-check">Regions</label>
               </div>
             </div>
             <div className="check-container">
@@ -258,9 +324,29 @@ class KML extends React.Component {
                 </div>
               </div>
             </div>
-            <Button className="next-button" variant="success">
+            <Button
+              className="next-button"
+              variant="success"
+              onClick={() => this.convert()}
+            >
               Convert
             </Button>
+          </div>
+          <div
+            className={
+              this.state.step === 4 ? "step-container" : "step-container hidden"
+            }
+          >
+            <div className="status">
+              <i>Coverting {this.state.convertingStatus}</i>
+              <PulseLoader
+                color="#777777"
+                css={`
+                  margin-left: 10px;
+                `}
+                size={10}
+              />
+            </div>
           </div>
         </div>
       );

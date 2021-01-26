@@ -173,6 +173,7 @@ class KML extends React.Component {
               this.state.step === 1 ? "step-container" : "step-container hidden"
             }
           >
+            <h3>Upload sector file:</h3>
             <Dropzone
               onDrop={(acceptedFiles) => {
                 if (acceptedFiles !== null)
@@ -250,6 +251,7 @@ class KML extends React.Component {
                 />
                 <label htmlFor="artcc-high-check">ARTCC High Boundaries</label>
               </div>
+
               <div>
                 <input
                   type="checkbox"
@@ -260,6 +262,8 @@ class KML extends React.Component {
                 />
                 <label htmlFor="artcc-low-check">ARTCC Low Boundaries</label>
               </div>
+            </div>
+            <div className="check-container">
               <div>
                 <input
                   type="checkbox"
@@ -291,7 +295,7 @@ class KML extends React.Component {
                 <label htmlFor="labels-check">Labels</label>
               </div>
             </div>
-            <div className="check-container">
+            <div className="list-container">
               <div className="map-container">
                 <h5 className="map-label">SIDs:</h5>
                 <div className="map-list" id="sid-list">
@@ -370,6 +374,22 @@ class KML extends React.Component {
             >
               Convert
             </Button>
+          </div>
+          <div
+            className={
+              this.state.step === 4 ? "step-container" : "step-container hidden"
+            }
+          >
+            <div className="status">
+              <i>{this.state.convertingStatus}</i>
+              <PulseLoader
+                color="#777777"
+                css={`
+                  margin-left: 10px;
+                `}
+                size={10}
+              />
+            </div>
           </div>
           <div
             className={

@@ -130,6 +130,12 @@ body {
 }
 
 .check-container {
+  display: inline-block;
+  padding-left: 50px;
+  font-size: 1.2em;
+}
+
+.list-container {
   display: flex;
   justify-content: space-around;
 }

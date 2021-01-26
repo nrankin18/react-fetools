@@ -131,6 +131,12 @@ onmessage = function (e) {
     kml += `<Folder>\n<name>SID</name>\n`;
     e.data.sids.forEach((sid) => {
       kml += `<Folder>\n<name>` + sid + `</name>\n`;
+      sid = sid
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt/g, ">");
       const coords = e.data.data.sid.get(sid);
       var i = 0;
       while (i < coords.length) {

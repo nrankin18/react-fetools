@@ -45,11 +45,85 @@ onmessage = function (e) {
   if (e.data.artccHigh) {
     postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
     kml += `<Folder>\n<name>ARTCC HIGH</name>\n`;
+    e.data.data.artccHigh.forEach((coordArray, sector) => {
+      kml += `<Folder>\n<name>` + sector + `</name>\n`;
+      var i = 0;
+      while (i < coordArray.length) {
+        var currCoord = coordArray[i];
+        kml +=
+          `<Placemark>\n<name>` +
+          currCoord.color +
+          `</name>\n<LineString>\n<coordinates>\n`;
+        var currCoordDD = dmsToDD(currCoord.lat1, currCoord.long1);
+        var coordStr = currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+        currCoordDD = dmsToDD(currCoord.lat2, currCoord.long2);
+        coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+
+        var j = i + 1;
+
+        while (j < coordArray.length) {
+          const nextCoord = coordArray[j];
+          if (nextCoord.color != currCoord.color) break;
+          if (
+            nextCoord.lat1 != currCoord.lat2 ||
+            nextCoord.long1 != currCoord.long2
+          )
+            break;
+
+          currCoordDD = dmsToDD(nextCoord.lat2, nextCoord.long2);
+          coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+          currCoord = nextCoord;
+          j++;
+        }
+        i = j;
+
+        kml += coordStr + "\n";
+        kml += `</coordinates>\n</LineString>\n</Placemark>`;
+      }
+      kml += `</Folder>\n`;
+    });
     kml += `</Folder>\n`;
   }
   if (e.data.artccLow) {
     postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
     kml += `<Folder>\n<name>ARTCC LOW</name>\n`;
+    e.data.data.artccLow.forEach((coordArray, sector) => {
+      kml += `<Folder>\n<name>` + sector + `</name>\n`;
+      var i = 0;
+      while (i < coordArray.length) {
+        var currCoord = coordArray[i];
+        kml +=
+          `<Placemark>\n<name>` +
+          currCoord.color +
+          `</name>\n<LineString>\n<coordinates>\n`;
+        var currCoordDD = dmsToDD(currCoord.lat1, currCoord.long1);
+        var coordStr = currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+        currCoordDD = dmsToDD(currCoord.lat2, currCoord.long2);
+        coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+
+        var j = i + 1;
+
+        while (j < coordArray.length) {
+          const nextCoord = coordArray[j];
+          if (nextCoord.color != currCoord.color) break;
+          if (
+            nextCoord.lat1 != currCoord.lat2 ||
+            nextCoord.long1 != currCoord.long2
+          )
+            break;
+
+          currCoordDD = dmsToDD(nextCoord.lat2, nextCoord.long2);
+          coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+          currCoord = nextCoord;
+          j++;
+        }
+        i = j;
+
+        kml += coordStr + "\n";
+        kml += `</coordinates>\n</LineString>\n</Placemark>`;
+      }
+      kml += `</Folder>\n`;
+    });
     kml += `</Folder>\n`;
   }
   if (e.data.sids.length !== 0) {
@@ -65,6 +139,39 @@ onmessage = function (e) {
   if (e.data.geo) {
     postMessage({ isStatus: 1, status: "Geography" });
     kml += `<Folder>\n<name>GEO</name>\n`;
+    var i = 0;
+    console.log(e.data.data.geo);
+    while (i < e.data.data.geo.length) {
+      var currCoord = e.data.data.geo[i];
+      kml +=
+        `<Placemark>\n<name>` +
+        currCoord.color +
+        `</name>\n<LineString>\n<coordinates>\n`;
+      var currCoordDD = dmsToDD(currCoord.lat1, currCoord.long1);
+      var coordStr = currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+      currCoordDD = dmsToDD(currCoord.lat2, currCoord.long2);
+      coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+
+      var j = i + 1;
+
+      while (j < e.data.data.geo.length) {
+        const nextCoord = e.data.data.geo[j];
+        if (nextCoord.color != currCoord.color) break;
+        if (
+          nextCoord.lat1 != currCoord.lat2 ||
+          nextCoord.long1 != currCoord.long2
+        )
+          break;
+        currCoordDD = dmsToDD(nextCoord.lat2, nextCoord.long2);
+        coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+        currCoord = nextCoord;
+        j++;
+      }
+      i = j;
+
+      kml += coordStr + "\n";
+      kml += `</coordinates>\n</LineString>\n</Placemark>`;
+    }
     kml += `</Folder>\n`;
   }
   if (e.data.regions) {
@@ -88,6 +195,7 @@ function dmsToDD(lat, long) {
     parseFloat(lat.substring(8, 14)) / 3600.0;
   if (lat.charAt(0) == "S") latDD *= -1;
 
+  console.log(lat, long);
   var longDD =
     parseInt(long.substring(1, 4)) +
     parseInt(long.substring(5, 7)) / 60.0 +

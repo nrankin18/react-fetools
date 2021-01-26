@@ -343,7 +343,7 @@ class KML extends React.Component {
             }
           >
             <div className="status">
-              <i>Coverting {this.state.convertingStatus}</i>
+              <i>Converting {this.state.convertingStatus}</i>
               <PulseLoader
                 color="#777777"
                 css={`

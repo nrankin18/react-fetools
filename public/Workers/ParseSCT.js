@@ -208,6 +208,12 @@ onmessage = function (e) {
         }
         break;
       case 6:
+        if (
+          !/[NS]\d{3}.\d{2}.\d{2}.\d{3}\s[EW]\d{3}.\d{2}.\d{2}.\d{3}\s[NS]\d{3}.\d{2}.\d{2}.\d{3}\s[EW]\d{3}.\d{2}.\d{2}.\d{3}\s\w*/.test(
+            line
+          )
+        )
+          break;
         line = line.split(" ");
         parsedObject.geo.push({
           lat1: line[0],

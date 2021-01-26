@@ -17,7 +17,7 @@ class KML extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      step: 5,
+      step: 1,
       file: null,
       readingStatus: "Reading File",
       convertingStatus: "Converting File",

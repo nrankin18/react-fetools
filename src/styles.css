@@ -61,6 +61,10 @@ body {
   margin: 20px 0;
 }
 
+.download-subtitle {
+  font-size: 24px;
+}
+
 .page-container {
   border: 2px solid grey;
   border-radius: 3px;

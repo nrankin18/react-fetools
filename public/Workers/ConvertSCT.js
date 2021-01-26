@@ -1,7 +1,7 @@
 onmessage = function (e) {
   var kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">\n<Folder>\n<name>Sector</name>\n`;
   if (e.data.artcc) {
-    postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+    postMessage({ isStatus: 1, status: "Converting ARTCC Boundaries" });
     kml += `<Folder>\n<name>ARTCC</name>\n`;
     e.data.data.artcc.forEach((coordArray, sector) => {
       kml += `<Folder>\n<name>` + sector + `</name>\n`;
@@ -43,7 +43,7 @@ onmessage = function (e) {
     kml += `</Folder>\n`;
   }
   if (e.data.artccHigh) {
-    postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+    postMessage({ isStatus: 1, status: "Converting ARTCC Boundaries" });
     kml += `<Folder>\n<name>ARTCC HIGH</name>\n`;
     e.data.data.artccHigh.forEach((coordArray, sector) => {
       kml += `<Folder>\n<name>` + sector + `</name>\n`;
@@ -85,7 +85,7 @@ onmessage = function (e) {
     kml += `</Folder>\n`;
   }
   if (e.data.artccLow) {
-    postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+    postMessage({ isStatus: 1, status: "Converting ARTCC Boundaries" });
     kml += `<Folder>\n<name>ARTCC LOW</name>\n`;
     e.data.data.artccLow.forEach((coordArray, sector) => {
       kml += `<Folder>\n<name>` + sector + `</name>\n`;
@@ -127,20 +127,93 @@ onmessage = function (e) {
     kml += `</Folder>\n`;
   }
   if (e.data.sids.length !== 0) {
-    postMessage({ isStatus: 1, status: "SIDs" });
+    postMessage({ isStatus: 1, status: "Converting SIDs" });
     kml += `<Folder>\n<name>SID</name>\n`;
+    e.data.sids.forEach((sid) => {
+      kml += `<Folder>\n<name>` + sid + `</name>\n`;
+      const coords = e.data.data.sid.get(sid);
+      var i = 0;
+      while (i < coords.length) {
+        var currCoord = coords[i];
+        kml +=
+          `<Placemark>\n<name>` +
+          currCoord.color +
+          `</name>\n<LineString>\n<coordinates>\n`;
+        var currCoordDD = dmsToDD(currCoord.lat1, currCoord.long1);
+        var coordStr = currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+        currCoordDD = dmsToDD(currCoord.lat2, currCoord.long2);
+        coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+
+        var j = i + 1;
+
+        while (j < coords.length) {
+          const nextCoord = coords[j];
+          if (nextCoord.color != currCoord.color) break;
+          if (
+            nextCoord.lat1 != currCoord.lat2 ||
+            nextCoord.long1 != currCoord.long2
+          )
+            break;
+          currCoordDD = dmsToDD(nextCoord.lat2, nextCoord.long2);
+          coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+          currCoord = nextCoord;
+          j++;
+        }
+        i = j;
+
+        kml += coordStr + "\n";
+        kml += `</coordinates>\n</LineString>\n</Placemark>`;
+      }
+      kml += `</Folder>\n`;
+    });
     kml += `</Folder>\n`;
   }
   if (e.data.stars.length !== 0) {
-    postMessage({ isStatus: 1, status: "STARs" });
+    postMessage({ isStatus: 1, status: "Converting STARs" });
     kml += `<Folder>\n<name>STAR</name>\n`;
+    e.data.stars.forEach((star) => {
+      kml += `<Folder>\n<name>` + star + `</name>\n`;
+      const coords = e.data.data.star.get(star);
+      var i = 0;
+      while (i < coords.length) {
+        var currCoord = coords[i];
+        kml +=
+          `<Placemark>\n<name>` +
+          currCoord.color +
+          `</name>\n<LineString>\n<coordinates>\n`;
+        var currCoordDD = dmsToDD(currCoord.lat1, currCoord.long1);
+        var coordStr = currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+        currCoordDD = dmsToDD(currCoord.lat2, currCoord.long2);
+        coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+
+        var j = i + 1;
+
+        while (j < coords.length) {
+          const nextCoord = coords[j];
+          if (nextCoord.color != currCoord.color) break;
+          if (
+            nextCoord.lat1 != currCoord.lat2 ||
+            nextCoord.long1 != currCoord.long2
+          )
+            break;
+          currCoordDD = dmsToDD(nextCoord.lat2, nextCoord.long2);
+          coordStr += currCoordDD.long + "," + currCoordDD.lat + ",0 ";
+          currCoord = nextCoord;
+          j++;
+        }
+        i = j;
+
+        kml += coordStr + "\n";
+        kml += `</coordinates>\n</LineString>\n</Placemark>`;
+      }
+      kml += `</Folder>\n`;
+    });
     kml += `</Folder>\n`;
   }
   if (e.data.geo) {
-    postMessage({ isStatus: 1, status: "Geography" });
+    postMessage({ isStatus: 1, status: "Converting Geography" });
     kml += `<Folder>\n<name>GEO</name>\n`;
     var i = 0;
-    console.log(e.data.data.geo);
     while (i < e.data.data.geo.length) {
       var currCoord = e.data.data.geo[i];
       kml +=
@@ -175,10 +248,9 @@ onmessage = function (e) {
     kml += `</Folder>\n`;
   }
   if (e.data.regions) {
-    postMessage({ isStatus: 1, status: "Regions" });
+    postMessage({ isStatus: 1, status: "Converting Regions" });
     kml += `<Folder>\n<name>REGIONS</name>\n`;
     e.data.data.regions.forEach((region) => {
-      console.log(region);
       var coordStr = "";
       region.coordinates.forEach((coord) => {
         const coordDD = dmsToDD(coord.lat, coord.long);
@@ -195,7 +267,7 @@ onmessage = function (e) {
     kml += `</Folder>\n`;
   }
   if (e.data.labels) {
-    postMessage({ isStatus: 1, status: "Labels" });
+    postMessage({ isStatus: 1, status: "Converting Labels" });
     kml += `<Folder>\n<name>LABELS</name>\n`;
     e.data.data.labels.forEach((label) => {
       const coord = dmsToDD(label.lat, label.long);

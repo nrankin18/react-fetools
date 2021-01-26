@@ -4,7 +4,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Progress from "./Progress";
 import Dropzone from "react-dropzone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUpload,
+  faCheck,
+  faDownload,
+} from "@fortawesome/free-solid-svg-icons";
 import Button from "react-bootstrap/Button";
 import PulseLoader from "react-spinners/PulseLoader";
 import FileSaver from "file-saver";
@@ -13,10 +17,10 @@ class KML extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      step: 1,
+      step: 5,
       file: null,
-      readingStatus: "File",
-      convertingStatus: "File",
+      readingStatus: "Reading File",
+      convertingStatus: "Converting File",
       artcc: 0,
       artccHigh: 0,
       artccLow: 0,
@@ -26,6 +30,25 @@ class KML extends React.Component {
       sids: [],
       stars: [],
     };
+  }
+
+  componentDidUpdate(e) {
+    if (e.visible === false) {
+      this.setState({
+        step: 1,
+        file: null,
+        readingStatus: "Reading File",
+        convertingStatus: "Converting File",
+        artcc: 0,
+        artccHigh: 0,
+        artccLow: 0,
+        geo: 0,
+        labels: 0,
+        regions: 0,
+        sids: [],
+        stars: [],
+      });
+    }
   }
 
   readFile() {
@@ -50,6 +73,17 @@ class KML extends React.Component {
   convert() {
     this.setState({ step: 4 });
     const worker = new Worker("Workers/ConvertSCT.js");
+
+    const selectedMaps = document.getElementsByClassName("selected");
+
+    var selectedSIDs = [];
+    var selectedSTARs = [];
+
+    for (let map of selectedMaps) {
+      if (map.classList.contains("sid")) selectedSIDs.push(map.innerHTML);
+      else selectedSTARs.push(map.innerHTML);
+    }
+
     worker.postMessage({
       artcc: this.state.artcc,
       artccHigh: this.state.artccHigh,
@@ -57,8 +91,8 @@ class KML extends React.Component {
       geo: this.state.geo,
       regions: this.state.regions,
       labels: this.state.labels,
-      sids: this.state.sids,
-      stars: this.state.stars,
+      sids: selectedSIDs,
+      stars: selectedSTARs,
       data: this.state.parsedObject,
     });
     worker.onmessage = function (e) {
@@ -179,7 +213,7 @@ class KML extends React.Component {
             }
           >
             <div className="status">
-              <i>Reading {this.state.readingStatus}</i>
+              <i>{this.state.readingStatus}</i>
               <PulseLoader
                 color="#777777"
                 css={`
@@ -339,11 +373,13 @@ class KML extends React.Component {
           </div>
           <div
             className={
-              this.state.step === 4 ? "step-container" : "step-container hidden"
+              this.state.step === 5 ? "step-container" : "step-container hidden"
             }
           >
             <div className="status">
-              <i>Converting {this.state.convertingStatus}</i>
+              <FontAwesomeIcon icon={faDownload} />
+              <br />
+              <i>Downloading File</i>
               <PulseLoader
                 color="#777777"
                 css={`
@@ -351,6 +387,31 @@ class KML extends React.Component {
                 `}
                 size={10}
               />
+              <div className="download-subtitle">
+                Issues? Please send me an email at{" "}
+                <a href="mailto:nathanr@bvartcc.com">nathanr@bvartcc.com</a>
+              </div>
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  this.setState({
+                    step: 1,
+                    file: null,
+                    readingStatus: "Reading File",
+                    convertingStatus: "Converting File",
+                    artcc: 0,
+                    artccHigh: 0,
+                    artccLow: 0,
+                    geo: 0,
+                    labels: 0,
+                    regions: 0,
+                    sids: [],
+                    stars: [],
+                  });
+                }}
+              >
+                Convert another File
+              </Button>
             </div>
           </div>
         </div>

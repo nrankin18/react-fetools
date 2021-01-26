@@ -44,42 +44,42 @@ onmessage = function (e) {
     }
 
     if (line.toUpperCase() === "[ARTCC]") {
-      postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+      postMessage({ isStatus: 1, status: "Parsing ARTCC Boundaries" });
       state = 1;
       continue;
     }
     if (line.toUpperCase() === "[ARTCC HIGH]") {
-      postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+      postMessage({ isStatus: 1, status: "Parsing ARTCC Boundaries" });
       state = 2;
       continue;
     }
     if (line.toUpperCase() === "[ARTCC LOW]") {
-      postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
+      postMessage({ isStatus: 1, status: "Parsing ARTCC Boundaries" });
       state = 3;
       continue;
     }
     if (line.toUpperCase() === "[SID]") {
-      postMessage({ isStatus: 1, status: "SIDs" });
+      postMessage({ isStatus: 1, status: "Parsing SIDs" });
       state = 4;
       continue;
     }
     if (line.toUpperCase() === "[STAR]") {
-      postMessage({ isStatus: 1, status: "STARs" });
+      postMessage({ isStatus: 1, status: "Parsing STARs" });
       state = 5;
       continue;
     }
     if (line.toUpperCase() === "[GEO]") {
-      postMessage({ isStatus: 1, status: "Geography" });
+      postMessage({ isStatus: 1, status: "Parsing Geography" });
       state = 6;
       continue;
     }
     if (line.toUpperCase() === "[REGIONS]") {
-      postMessage({ isStatus: 1, status: "Regions" });
+      postMessage({ isStatus: 1, status: "Parsing Regions" });
       state = 7;
       continue;
     }
     if (line.toUpperCase() === "[LABELS]") {
-      postMessage({ isStatus: 1, status: "Labels" });
+      postMessage({ isStatus: 1, status: "Parsing Labels" });
       state = 8;
       continue;
     }
@@ -170,10 +170,10 @@ onmessage = function (e) {
       case 4:
         if (!/^\s/.test(line)) {
           currentSID = line.substring(0, 26).trimRight();
-          postMessage({ isStatus: 1, status: currentSID });
+          postMessage({ isStatus: 1, status: "Parsing SID: " + currentSID });
           parsedObject.sid.set(currentSID, []);
         } else {
-          line = line.split(/\s+/);
+          line = line.trim().split(/\s+/);
           parsedObject.sid.set(
             currentSID,
             parsedObject.sid.get(currentSID).concat([
@@ -191,10 +191,10 @@ onmessage = function (e) {
       case 5:
         if (!/^\s/.test(line)) {
           currentSTAR = line.substring(0, 26).trimRight();
-          postMessage({ isStatus: 1, status: currentSTAR });
+          postMessage({ isStatus: 1, status: "Parsing STAR: " + currentSTAR });
           parsedObject.star.set(currentSTAR, []);
         } else {
-          line = line.split(/\s+/);
+          line = line.trim().split(/\s+/);
           parsedObject.star.set(
             currentSTAR,
             parsedObject.star.get(currentSTAR).concat([

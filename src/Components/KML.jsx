@@ -239,22 +239,22 @@ class KML extends React.Component {
               <div>
                 <input
                   type="checkbox"
-                  id="labels-check"
-                  onClick={(e) => {
-                    this.setState({ labels: e.target.checked });
-                  }}
-                />
-                <label htmlFor="labels-check">Labels</label>
-              </div>
-              <div>
-                <input
-                  type="checkbox"
                   id="regions-check"
                   onClick={(e) => {
                     this.setState({ regions: e.target.checked });
                   }}
                 />
                 <label htmlFor="regions-check">Regions</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  id="labels-check"
+                  onClick={(e) => {
+                    this.setState({ labels: e.target.checked });
+                  }}
+                />
+                <label htmlFor="labels-check">Labels</label>
               </div>
             </div>
             <div className="check-container">

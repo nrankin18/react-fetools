@@ -39,8 +39,10 @@ onmessage = function (e) {
       line.toUpperCase() === "[FIXES]" ||
       line.toUpperCase() === "[LOW AIRWAY]" ||
       line.toUpperCase() === "[HIGH AIRWAY]"
-    )
+    ) {
       state = 0;
+    }
+
     if (line.toUpperCase() === "[ARTCC]") {
       postMessage({ isStatus: 1, status: "ARTCC Boundaries" });
       state = 1;
@@ -85,7 +87,7 @@ onmessage = function (e) {
       case 0:
         continue;
       case 1:
-        line = line.split(" ");
+        line = line.split(/\s+/);
         if (parsedObject.artcc.has(line[0])) {
           parsedObject.artcc.set(
             line[0],
@@ -112,7 +114,7 @@ onmessage = function (e) {
         }
         break;
       case 2:
-        line = line.split(" ");
+        line = line.split(/\s+/);
         if (parsedObject.artccHigh.has(line[0])) {
           parsedObject.artccHigh.set(
             line[0],
@@ -139,7 +141,7 @@ onmessage = function (e) {
         }
         break;
       case 3:
-        line = line.split(" ");
+        line = line.split(/\s+/);
         if (parsedObject.artccLow.has(line[0])) {
           parsedObject.artccLow.set(
             line[0],
@@ -171,7 +173,7 @@ onmessage = function (e) {
           postMessage({ isStatus: 1, status: currentSID });
           parsedObject.sid.set(currentSID, []);
         } else {
-          line = line.split(" ");
+          line = line.split(/\s+/);
           parsedObject.sid.set(
             currentSID,
             parsedObject.sid.get(currentSID).concat([
@@ -192,7 +194,7 @@ onmessage = function (e) {
           postMessage({ isStatus: 1, status: currentSTAR });
           parsedObject.star.set(currentSTAR, []);
         } else {
-          line = line.split(" ");
+          line = line.split(/\s+/);
           parsedObject.star.set(
             currentSTAR,
             parsedObject.star.get(currentSTAR).concat([
@@ -209,12 +211,12 @@ onmessage = function (e) {
         break;
       case 6:
         if (
-          !/[NS]\d{3}.\d{2}.\d{2}.\d{3}\s[EW]\d{3}.\d{2}.\d{2}.\d{3}\s[NS]\d{3}.\d{2}.\d{2}.\d{3}\s[EW]\d{3}.\d{2}.\d{2}.\d{3}\s\w*/.test(
+          !/[NS]\d+.\d+.\d+.\d+\s[EW]\d+.\d+.\d+.\d+\s[NS]\d+.\d+.\d+.\d+\s[EW]\d+.\d+.\d+.\d+\s\w*/.test(
             line
           )
         )
           break;
-        line = line.split(" ");
+        line = line.split(/\s+/);
         parsedObject.geo.push({
           lat1: line[0],
           long1: line[1],
@@ -224,22 +226,23 @@ onmessage = function (e) {
         });
         break;
       case 7:
-        if (!/^\s/.test(line)) {
-          console.log(regionBuffer);
+        if (!/^\s+/.test(line)) {
           if (regionBuffer !== null) {
             parsedObject.regions.push(regionBuffer);
+            regionBuffer = null;
           }
-          line = line.split(" ");
+          line = line.split(/\s+/);
           regionBuffer = {
             color: line[0],
-            coordinates: [{ lat: line[1], long: line[2] }],
+            coordinates: [{ lat: line[1], long: line[2].padEnd(25, ".") }],
           };
         } else {
-          line = line.trim().split(" ");
+          line = line.trim().split(/\s+/);
           regionBuffer.coordinates = regionBuffer.coordinates.concat([
             { lat: line[0], long: line[1] },
           ]);
         }
+
         break;
       case 8:
         line = line.match(/(?:[^\s"]+|"[^"]*")+/g); //Split line on spaces not inside quotes
@@ -247,12 +250,16 @@ onmessage = function (e) {
           lat: line[1],
           long: line[2],
           label: line[0].replace(/"/g, ""),
-          color: line[4] ?? "",
+          color: line[3] ?? "",
         });
         break;
       default:
         continue;
     }
+  }
+  if (regionBuffer !== null) {
+    parsedObject.regions.push(regionBuffer);
+    regionBuffer = null;
   }
   postMessage({ isStatus: 0, parsedObject: parsedObject });
 };

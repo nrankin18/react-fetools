@@ -177,11 +177,40 @@ onmessage = function (e) {
   if (e.data.regions) {
     postMessage({ isStatus: 1, status: "Regions" });
     kml += `<Folder>\n<name>REGIONS</name>\n`;
+    e.data.data.regions.forEach((region) => {
+      console.log(region);
+      var coordStr = "";
+      region.coordinates.forEach((coord) => {
+        const coordDD = dmsToDD(coord.lat, coord.long);
+        coordStr += coordDD.long + "," + coordDD.lat + ",0 ";
+      });
+      kml +=
+        `<Placemark>\n<name>` +
+        region.color +
+        `</name>\n<Polygon>\n<outerBoundaryIs>\n<LinearRing>\n<coordinates>` +
+        coordStr +
+        `\n</coordinates>\n</LinearRing>\n</outerBoundaryIs>\n</Polygon>\n</Placemark>`;
+    });
+
     kml += `</Folder>\n`;
   }
   if (e.data.labels) {
     postMessage({ isStatus: 1, status: "Labels" });
     kml += `<Folder>\n<name>LABELS</name>\n`;
+    e.data.data.labels.forEach((label) => {
+      const coord = dmsToDD(label.lat, label.long);
+      kml +=
+        `<Placemark>\n<name>` +
+        label.label +
+        `</name>\n<description>` +
+        label.color +
+        `</description>\n<Point>\n<coordinates>` +
+        coord.long +
+        "," +
+        coord.lat +
+        ",0" +
+        `</coordinates>\n</Point>\n</Placemark>`;
+    });
     kml += `</Folder>\n`;
   }
   kml += `</Folder>\n</kml>`;
@@ -189,18 +218,21 @@ onmessage = function (e) {
 };
 
 function dmsToDD(lat, long) {
+  lat = lat.split(".");
   var latDD =
-    parseInt(lat.substring(1, 4)) +
-    parseInt(lat.substring(5, 7)) / 60.0 +
-    parseFloat(lat.substring(8, 14)) / 3600.0;
-  if (lat.charAt(0) == "S") latDD *= -1;
+    parseInt(lat[0].substring(1)) +
+    parseInt(lat[1]) / 60.0 +
+    parseFloat(lat[2] + "." + lat[3]) / 3600.0;
 
-  console.log(lat, long);
+  if (lat[0].charAt(0) == "S") latDD *= -1;
+
+  long = long.split(".");
   var longDD =
-    parseInt(long.substring(1, 4)) +
-    parseInt(long.substring(5, 7)) / 60.0 +
-    parseFloat(long.substring(8, 14)) / 3600.0;
-  if (long.charAt(0) == "W") longDD *= -1;
+    parseInt(long[0].substring(1)) +
+    parseInt(long[1]) / 60.0 +
+    parseFloat(long[2] + "." + long[3]) / 3600.0;
+
+  if (long[0].charAt(0) == "W") longDD *= -1;
 
   return { lat: latDD, long: longDD };
 }

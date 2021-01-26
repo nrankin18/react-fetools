@@ -168,6 +168,7 @@ onmessage = function (e) {
       case 4:
         if (!/^\s/.test(line)) {
           currentSID = line.substring(0, 26).trimRight();
+          postMessage({ isStatus: 1, status: currentSID });
           parsedObject.sid.set(currentSID, []);
         } else {
           line = line.split(" ");
@@ -188,6 +189,7 @@ onmessage = function (e) {
       case 5:
         if (!/^\s/.test(line)) {
           currentSTAR = line.substring(0, 26).trimRight();
+          postMessage({ isStatus: 1, status: currentSTAR });
           parsedObject.star.set(currentSTAR, []);
         } else {
           line = line.split(" ");

@@ -7,12 +7,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
 import Button from "react-bootstrap/Button";
 import PulseLoader from "react-spinners/PulseLoader";
+import FileSaver from "file-saver";
 
 class KML extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      step: 3,
+      step: 1,
       file: null,
       readingStatus: "File",
       convertingStatus: "File",
@@ -64,6 +65,10 @@ class KML extends React.Component {
       if (e.data.isStatus) {
         this.setState({ convertingStatus: e.data.status });
       } else {
+        var kml = new Blob([e.data.kml], {
+          type: "text/plain;charset=utf-8",
+        });
+        FileSaver.saveAs(kml, "sector.kml");
         this.setState({ step: 5 });
       }
     }.bind(this);
